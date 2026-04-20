@@ -1,0 +1,5 @@
+aws_region     = "us-east-1"
+environment    = "production"
+domain_name    = "app.example.com"
+api_domain     = "api.example.com"
+execution_mode = "disabled"

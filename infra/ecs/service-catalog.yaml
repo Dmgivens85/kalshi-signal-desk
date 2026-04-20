@@ -1,0 +1,106 @@
+services:
+  web:
+    exposure: public
+    ecs_type: service
+    launch_type: fargate
+    healthcheck_path: /api/health
+    desired_count:
+      staging: 1
+      production: 2
+    cpu: 512
+    memory: 1024
+    dockerfile: infra/docker/web.production.Dockerfile
+  api:
+    exposure: public
+    ecs_type: service
+    launch_type: fargate
+    healthcheck_path: /api/health/ready
+    desired_count:
+      staging: 1
+      production: 2
+    cpu: 512
+    memory: 1024
+    dockerfile: infra/docker/api.production.Dockerfile
+  market-stream:
+    exposure: internal
+    ecs_type: service
+    launch_type: fargate
+    healthcheck_path: http://127.0.0.1:9090/ready
+    desired_count:
+      staging: 1
+      production: 1
+    cpu: 512
+    memory: 1024
+    service_module: market_stream.main
+    dockerfile: infra/docker/python-service.production.Dockerfile
+  external-enrichment:
+    exposure: internal
+    ecs_type: service
+    launch_type: fargate
+    healthcheck_path: http://127.0.0.1:9090/ready
+    desired_count:
+      staging: 1
+      production: 1
+    cpu: 512
+    memory: 1024
+    service_module: external_enrichment.main
+    dockerfile: infra/docker/python-service.production.Dockerfile
+  signal-engine:
+    exposure: internal
+    ecs_type: service
+    launch_type: fargate
+    healthcheck_path: http://127.0.0.1:9090/ready
+    desired_count:
+      staging: 1
+      production: 1
+    cpu: 512
+    memory: 1024
+    service_module: signal_engine.main
+    dockerfile: infra/docker/python-service.production.Dockerfile
+  execution-engine:
+    exposure: internal
+    ecs_type: service
+    launch_type: fargate
+    healthcheck_path: http://127.0.0.1:9090/ready
+    desired_count:
+      staging: 1
+      production: 1
+    cpu: 512
+    memory: 1024
+    service_module: execution_engine.main
+    dockerfile: infra/docker/python-service.production.Dockerfile
+  notifier:
+    exposure: internal
+    ecs_type: service
+    launch_type: fargate
+    healthcheck_path: http://127.0.0.1:9090/ready
+    desired_count:
+      staging: 1
+      production: 1
+    cpu: 256
+    memory: 512
+    service_module: notifier.main
+    dockerfile: infra/docker/python-service.production.Dockerfile
+  scheduler:
+    exposure: internal
+    ecs_type: service
+    launch_type: fargate
+    healthcheck_path: http://127.0.0.1:9090/ready
+    desired_count:
+      staging: 1
+      production: 1
+    cpu: 256
+    memory: 512
+    service_module: scheduler.main
+    dockerfile: infra/docker/python-service.production.Dockerfile
+jobs:
+  migrate:
+    ecs_type: one_off_task
+    launch_type: fargate
+    dockerfile: infra/docker/api.production.Dockerfile
+    command:
+      - alembic
+      - -c
+      - services/api/alembic.ini
+      - upgrade
+      - head

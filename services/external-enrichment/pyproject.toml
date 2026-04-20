@@ -1,0 +1,19 @@
+[project]
+name = "external-enrichment"
+version = "0.1.0"
+description = "External enrichment worker shell."
+requires-python = ">=3.11"
+dependencies = [
+  "shared-py",
+  "sqlalchemy>=2.0,<3",
+  "asyncpg>=0.29,<1",
+  "redis>=5.0,<6",
+  "httpx>=0.27,<1",
+]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

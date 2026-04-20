@@ -1,0 +1,17 @@
+[project]
+name = "kalshi-worker"
+version = "0.1.0"
+description = "Background worker service for Kalshi market intelligence."
+requires-python = ">=3.11"
+dependencies = [
+  "redis>=5.0,<6",
+  "tenacity>=8.4,<9",
+  "kalshi-python-common",
+]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

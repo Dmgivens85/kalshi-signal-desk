@@ -1,0 +1,5 @@
+aws_region     = "us-east-1"
+environment    = "staging"
+domain_name    = "staging.example.com"
+api_domain     = "api.staging.example.com"
+execution_mode = "paper"

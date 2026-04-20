@@ -1,0 +1,5 @@
+cryptography<45,>=42
+httpx<1,>=0.27
+pydantic<3,>=2.7
+tenacity<9,>=8.4
+websockets<16,>=13

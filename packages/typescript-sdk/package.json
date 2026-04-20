@@ -1,0 +1,17 @@
+{
+  "name": "@kalshi/sdk",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "lint": "echo 'sdk lint placeholder'",
+    "typecheck": "tsc --project tsconfig.json --noEmit",
+    "format": "prettier --check src"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.3"
+  }
+}

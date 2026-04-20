@@ -1,0 +1,16 @@
+[project]
+name = "kalshi-python-common"
+version = "0.1.0"
+description = "Shared schemas, settings, and utilities for Kalshi platform Python services."
+requires-python = ">=3.11"
+dependencies = [
+  "pydantic>=2.7,<3",
+  "pydantic-settings>=2.3,<3",
+]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

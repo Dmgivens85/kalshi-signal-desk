@@ -1,0 +1,20 @@
+[project]
+name = "notifier"
+version = "0.1.0"
+description = "Notification service shell."
+requires-python = ">=3.11"
+dependencies = [
+  "shared-py",
+  "httpx>=0.27,<1",
+  "redis>=5.0,<6",
+  "sqlalchemy>=2.0,<3",
+  "asyncpg>=0.29,<1",
+  "tenacity>=8.4,<9",
+]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

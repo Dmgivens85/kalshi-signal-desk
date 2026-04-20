@@ -1,0 +1,18 @@
+[project]
+name = "market-stream"
+version = "0.1.0"
+description = "Kalshi websocket listener service shell."
+requires-python = ">=3.11"
+dependencies = [
+  "shared-py",
+  "sqlalchemy>=2.0,<3",
+  "asyncpg>=0.29,<1",
+  "redis>=5.0,<6",
+]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,13 @@
+[project]
+name = "execution-engine"
+version = "0.1.0"
+description = "Guarded execution service shell."
+requires-python = ">=3.11"
+dependencies = ["shared-py", "kalshi-client", "sqlalchemy", "asyncpg", "pydantic", "pydantic-settings"]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

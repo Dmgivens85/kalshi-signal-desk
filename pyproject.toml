@@ -1,0 +1,36 @@
+[project]
+name = "kalshi-signal-desk"
+version = "0.1.0"
+description = "Long-term monorepo scaffold for Kalshi Signal Desk."
+requires-python = ">=3.11"
+
+[tool.uv.workspace]
+members = [
+  "apps/api",
+  "packages/kalshi-client",
+  "packages/python-common",
+  "packages/shared-py",
+  "services/execution-engine",
+  "services/external-enrichment",
+  "services/market-stream",
+  "services/notifier",
+  "services/api",
+  "services/scheduler",
+  "services/signal-engine",
+  "services/worker",
+]
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "packages/python-common/src",
+  "packages/shared-py/src",
+  "services/api",
+  "services/execution-engine/src",
+  "services/external-enrichment/src",
+  "services/market-stream/src",
+  "services/notifier/src",
+  "services/scheduler/src",
+  "services/signal-engine/src",
+  "services/worker/src",
+]
+testpaths = ["services/api/tests"]
