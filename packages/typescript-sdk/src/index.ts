@@ -170,11 +170,14 @@ const fallbackAlerts: SignalAlert[] = [
 ];
 
 function getApiBaseUrl(): string {
-  return (
-    process.env.NEXT_PUBLIC_API_BASE_URL ??
-    process.env.API_BASE_URL ??
-    "http://localhost:8000"
-  );
+  const configured = process.env.NEXT_PUBLIC_API_BASE_URL ?? process.env.API_BASE_URL;
+  if (!configured) {
+    return "http://localhost:8000";
+  }
+  if (/^https?:\/\//.test(configured)) {
+    return configured;
+  }
+  return `http://${configured}`;
 }
 
 async function safeFetch<T>(path: string): Promise<T | null> {

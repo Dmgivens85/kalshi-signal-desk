@@ -30,6 +30,7 @@ class KalshiClientConfig(BaseSettings):
 
     environment: KalshiEnvironment = Field(default=KalshiEnvironment.DEMO, alias="KALSHI_ENV")
     api_key_id: str | None = Field(default=None, alias="KALSHI_API_KEY_ID")
+    private_key_pem: str | None = Field(default=None, alias="KALSHI_PRIVATE_KEY_PEM")
     private_key_path: Path | None = Field(default=None, alias="KALSHI_PRIVATE_KEY_PATH")
     api_base_url: str | None = Field(default=None, alias="KALSHI_API_BASE_URL")
     ws_url: str | None = Field(default=None, alias="KALSHI_WS_URL")
@@ -61,11 +62,15 @@ class KalshiClientConfig(BaseSettings):
     def require_credentials(self) -> None:
         if not self.api_key_id:
             raise KalshiConfigurationError("KALSHI_API_KEY_ID is required for authenticated Kalshi access.")
-        if self.private_key_path is None:
-            raise KalshiConfigurationError("KALSHI_PRIVATE_KEY_PATH is required for authenticated Kalshi access.")
+        if self.private_key_pem is None and self.private_key_path is None:
+            raise KalshiConfigurationError(
+                "Either KALSHI_PRIVATE_KEY_PEM or KALSHI_PRIVATE_KEY_PATH is required for authenticated Kalshi access."
+            )
 
     def load_private_key_pem(self) -> str:
         self.require_credentials()
+        if self.private_key_pem:
+            return self.private_key_pem
         assert self.private_key_path is not None
         if not self.private_key_path.exists():
             raise KalshiConfigurationError(

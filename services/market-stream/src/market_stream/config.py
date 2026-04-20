@@ -15,6 +15,7 @@ class MarketStreamSettings(BaseSettings):
     kalshi_stream_watchlist: str = Field(default="", alias="KALSHI_STREAM_WATCHLIST")
     kalshi_env: str = Field(default="demo", alias="KALSHI_ENV")
     kalshi_api_key_id: str | None = Field(default=None, alias="KALSHI_API_KEY_ID")
+    kalshi_private_key_pem: str | None = Field(default=None, alias="KALSHI_PRIVATE_KEY_PEM")
     kalshi_private_key_path: str | None = Field(default=None, alias="KALSHI_PRIVATE_KEY_PATH")
     kalshi_api_base_url: str | None = Field(default=None, alias="KALSHI_API_BASE_URL")
     kalshi_ws_url: str | None = Field(default=None, alias="KALSHI_WS_URL")
@@ -32,6 +33,7 @@ class MarketStreamSettings(BaseSettings):
         return KalshiClientConfig(
             environment=self.kalshi_env,
             api_key_id=self.kalshi_api_key_id,
+            private_key_pem=self.kalshi_private_key_pem,
             private_key_path=self.kalshi_private_key_path,
             api_base_url=self.kalshi_api_base_url,
             ws_url=self.kalshi_ws_url,

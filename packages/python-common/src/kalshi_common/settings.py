@@ -1,4 +1,23 @@
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def _to_async_database_url(url: str) -> str:
+    if url.startswith("postgresql://"):
+        return url.replace("postgresql://", "postgresql+asyncpg://", 1)
+    if url.startswith("postgres://"):
+        return url.replace("postgres://", "postgresql+asyncpg://", 1)
+    return url
+
+
+def _to_sync_database_url(url: str) -> str:
+    if url.startswith("postgresql+asyncpg://"):
+        return url.replace("postgresql+asyncpg://", "postgresql+psycopg://", 1)
+    if url.startswith("postgresql://"):
+        return url.replace("postgresql://", "postgresql+psycopg://", 1)
+    if url.startswith("postgres://"):
+        return url.replace("postgres://", "postgresql+psycopg://", 1)
+    return url
 
 
 class PlatformSettings(BaseSettings):
@@ -18,6 +37,7 @@ class PlatformSettings(BaseSettings):
     kalshi_api_url: str | None = None
     kalshi_env: str = "demo"
     kalshi_api_key_id: str | None = None
+    kalshi_private_key_pem: str | None = None
     kalshi_private_key_path: str | None = None
     kalshi_request_timeout_seconds: float = 10.0
     kalshi_enable_trading: bool = False
@@ -33,3 +53,11 @@ class PlatformSettings(BaseSettings):
     notification_quiet_hours_start: int = 22
     notification_quiet_hours_end: int = 7
     notification_dedupe_window_seconds: int = 900
+
+    @model_validator(mode="after")
+    def normalize_database_urls(self) -> "PlatformSettings":
+        self.database_url = _to_async_database_url(self.database_url)
+        self.database_url_sync = _to_sync_database_url(self.database_url_sync)
+        if self.database_url_sync.startswith("sqlite:///./data/") and self.database_url.startswith("postgresql+asyncpg://"):
+            self.database_url_sync = _to_sync_database_url(self.database_url)
+        return self

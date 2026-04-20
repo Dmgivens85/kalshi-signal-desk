@@ -12,6 +12,7 @@ class AppSettings(BaseSettings):
     sentry_dsn: str | None = None
     kalshi_env: str = "demo"
     kalshi_api_key_id: str | None = None
+    kalshi_private_key_pem: str | None = None
     kalshi_private_key_path: str | None = None
     kalshi_api_base_url: str | None = None
     kalshi_ws_url: str | None = None

@@ -1,0 +1,299 @@
+databases:
+  - name: kalshi-signal-desk-db
+    databaseName: kalshi
+    user: kalshi
+    plan: basic-256mb
+    region: oregon
+
+services:
+  - type: keyvalue
+    name: kalshi-signal-desk-redis
+    plan: starter
+    region: oregon
+    ipAllowList: []
+
+  - type: web
+    runtime: docker
+    name: kalshi-signal-desk-api
+    plan: starter
+    region: oregon
+    dockerfilePath: ./infra/docker/api.production.Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health/ready
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: kalshi-signal-desk-db
+          property: connectionString
+      - key: DATABASE_URL_SYNC
+        fromDatabase:
+          name: kalshi-signal-desk-db
+          property: connectionString
+      - key: POSTGRES_URL
+        fromDatabase:
+          name: kalshi-signal-desk-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: kalshi-signal-desk-redis
+          property: connectionString
+      - key: EXECUTION_MODE
+        value: paper
+      - key: EXECUTION_LIVE_CONFIRMATION
+        value: "false"
+      - key: KALSHI_ENABLE_TRADING
+        value: "false"
+      - key: HEALTHCHECK_ENABLE_EXTERNALS
+        value: "false"
+      - key: KALSHI_ENV
+        value: demo
+      - key: KALSHI_API_KEY_ID
+        sync: false
+      - key: KALSHI_PRIVATE_KEY_PEM
+        sync: false
+      - key: KALSHI_STREAM_WATCHLIST
+        sync: false
+      - key: PUSHOVER_APP_TOKEN
+        sync: false
+      - key: PUSHOVER_DEFAULT_USER_KEY
+        sync: false
+      - key: NOTIFICATION_DEEP_LINK_BASE
+        sync: false
+      - key: MARKET_STREAM_HEALTH_URL
+        value: http://kalshi-market-stream:9090/ready
+      - key: EXTERNAL_ENRICHMENT_HEALTH_URL
+        value: http://kalshi-external-enrichment:9090/ready
+      - key: SIGNAL_ENGINE_HEALTH_URL
+        value: http://kalshi-signal-engine:9090/ready
+      - key: EXECUTION_ENGINE_HEALTH_URL
+        value: http://kalshi-execution-engine:9090/ready
+      - key: NOTIFIER_HEALTH_URL
+        value: http://kalshi-notifier:9090/ready
+      - key: SCHEDULER_HEALTH_URL
+        value: http://kalshi-scheduler:9090/ready
+
+  - type: web
+    runtime: docker
+    name: kalshi-signal-desk-web
+    plan: starter
+    region: oregon
+    dockerfilePath: ./infra/docker/web.production.Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: API_BASE_URL
+        fromService:
+          type: web
+          name: kalshi-signal-desk-api
+          property: hostport
+      - key: NEXT_PUBLIC_API_BASE_URL
+        sync: false
+
+  - type: worker
+    runtime: docker
+    name: kalshi-market-stream
+    plan: starter
+    region: oregon
+    dockerfilePath: ./infra/docker/python-service.production.Dockerfile
+    dockerContext: .
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: kalshi-signal-desk-db
+          property: connectionString
+      - key: POSTGRES_URL
+        fromDatabase:
+          name: kalshi-signal-desk-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: kalshi-signal-desk-redis
+          property: connectionString
+      - key: SERVICE_MODULE
+        value: market_stream.main
+      - key: SERVICE_HEALTH_PORT
+        value: "9090"
+      - key: KALSHI_ENV
+        value: demo
+      - key: KALSHI_API_KEY_ID
+        sync: false
+      - key: KALSHI_PRIVATE_KEY_PEM
+        sync: false
+      - key: KALSHI_STREAM_WATCHLIST
+        sync: false
+
+  - type: worker
+    runtime: docker
+    name: kalshi-external-enrichment
+    plan: starter
+    region: oregon
+    dockerfilePath: ./infra/docker/python-service.production.Dockerfile
+    dockerContext: .
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: kalshi-signal-desk-db
+          property: connectionString
+      - key: POSTGRES_URL
+        fromDatabase:
+          name: kalshi-signal-desk-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: kalshi-signal-desk-redis
+          property: connectionString
+      - key: SERVICE_MODULE
+        value: external_enrichment.main
+      - key: SERVICE_HEALTH_PORT
+        value: "9090"
+      - key: NEWS_API_URL
+        sync: false
+      - key: NEWS_API_KEY
+        sync: false
+      - key: POLYMARKET_API_URL
+        sync: false
+      - key: METACULUS_API_URL
+        sync: false
+      - key: MANIFOLD_API_URL
+        sync: false
+      - key: SPORTSBOOK_ODDS_API_URL
+        sync: false
+
+  - type: worker
+    runtime: docker
+    name: kalshi-signal-engine
+    plan: starter
+    region: oregon
+    dockerfilePath: ./infra/docker/python-service.production.Dockerfile
+    dockerContext: .
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: kalshi-signal-desk-db
+          property: connectionString
+      - key: POSTGRES_URL
+        fromDatabase:
+          name: kalshi-signal-desk-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: kalshi-signal-desk-redis
+          property: connectionString
+      - key: SERVICE_MODULE
+        value: signal_engine.main
+      - key: SERVICE_HEALTH_PORT
+        value: "9090"
+
+  - type: worker
+    runtime: docker
+    name: kalshi-execution-engine
+    plan: starter
+    region: oregon
+    dockerfilePath: ./infra/docker/python-service.production.Dockerfile
+    dockerContext: .
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: kalshi-signal-desk-db
+          property: connectionString
+      - key: POSTGRES_URL
+        fromDatabase:
+          name: kalshi-signal-desk-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: kalshi-signal-desk-redis
+          property: connectionString
+      - key: SERVICE_MODULE
+        value: execution_engine.main
+      - key: SERVICE_HEALTH_PORT
+        value: "9090"
+      - key: EXECUTION_MODE
+        value: paper
+      - key: EXECUTION_LIVE_CONFIRMATION
+        value: "false"
+      - key: KALSHI_ENABLE_TRADING
+        value: "false"
+
+  - type: worker
+    runtime: docker
+    name: kalshi-notifier
+    plan: starter
+    region: oregon
+    dockerfilePath: ./infra/docker/python-service.production.Dockerfile
+    dockerContext: .
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: kalshi-signal-desk-db
+          property: connectionString
+      - key: POSTGRES_URL
+        fromDatabase:
+          name: kalshi-signal-desk-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: kalshi-signal-desk-redis
+          property: connectionString
+      - key: SERVICE_MODULE
+        value: notifier.main
+      - key: SERVICE_HEALTH_PORT
+        value: "9090"
+      - key: PUSHOVER_APP_TOKEN
+        sync: false
+      - key: PUSHOVER_DEFAULT_USER_KEY
+        sync: false
+      - key: NOTIFICATION_DEEP_LINK_BASE
+        sync: false
+
+  - type: worker
+    runtime: docker
+    name: kalshi-scheduler
+    plan: starter
+    region: oregon
+    dockerfilePath: ./infra/docker/python-service.production.Dockerfile
+    dockerContext: .
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: kalshi-signal-desk-db
+          property: connectionString
+      - key: POSTGRES_URL
+        fromDatabase:
+          name: kalshi-signal-desk-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: kalshi-signal-desk-redis
+          property: connectionString
+      - key: SERVICE_MODULE
+        value: scheduler.main
+      - key: SERVICE_HEALTH_PORT
+        value: "9090"

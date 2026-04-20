@@ -72,6 +72,7 @@ class APISettings(PlatformSettings):
         return KalshiClientConfig(
             environment=env,
             api_key_id=self.kalshi_api_key_id,
+            private_key_pem=self.kalshi_private_key_pem,
             private_key_path=Path(self.kalshi_private_key_path) if self.kalshi_private_key_path else None,
             api_base_url=self.kalshi_api_base_url or self.kalshi_api_url,
             ws_url=self.kalshi_ws_url,
