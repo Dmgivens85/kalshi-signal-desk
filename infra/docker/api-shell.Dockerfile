@@ -12,7 +12,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY services/api/pyproject.toml services/api/pyproject.toml
 COPY packages/shared-py/pyproject.toml packages/shared-py/pyproject.toml
+COPY packages/shared-py/src packages/shared-py/src
 COPY packages/kalshi-client/pyproject.toml packages/kalshi-client/pyproject.toml
+COPY packages/kalshi-client/src packages/kalshi-client/src
 
 RUN pip install --upgrade pip && pip install -e packages/shared-py -e packages/kalshi-client -e services/api
 
